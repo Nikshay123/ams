@@ -1,0 +1,11 @@
+﻿@using TenantManagement.Common;
+@model TenantManagement.Models.EmailBaseModel
+@{
+    ViewBag.Title = "RSG Inventory Account Deactivated";
+    Layout = "~/EmailTemplates/_Layout.cshtml";
+}
+<p style="color:#024584">Hello @Model.Data[nameof(EmailDataKeys.Name)],</p>
+<p style="color:#024584">
+    The account "@Model.Data[nameof(EmailDataKeys.AccountName)]" has been deactivated and your user profile has been disassociated.  If you have questions please contact the account owner.
+</p>
+

@@ -1,0 +1,21 @@
+﻿@using TenantManagement.Common;
+@model TenantManagement.Models.EmailBaseModel
+@{
+    ViewBag.Title = "RSG Inventory Account Invitation";
+    Layout = "~/EmailTemplates/_Layout.cshtml";
+}
+
+<p style="color:#024584">Hello @Model.Data[nameof(EmailDataKeys.Name)],</p>
+<p style="color:#024584">@Model.Data[nameof(EmailDataKeys.FromName)] (@Model.Data[nameof(EmailDataKeys.FromEmail)]) has invited you to join their RSG Team. RSG Portal is a system that allows you to track and manage your genetic material inventory stored here at our RSG Facilities.</p>
+<a style="display: block;
+        background-color: #91bc7b;
+        padding: 0.75rem;
+        width: 12rem;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 10rem;
+        font-weight: bold;"
+   href="https://@Model.Data[nameof(EmailDataKeys.Domain)]/invitation-token?state=@Model.Data[nameof(EmailDataKeys.Id)]&code=@Model.Data[nameof(EmailDataKeys.Code)]">
+    Sign Up
+</a>

@@ -1,0 +1,13 @@
+﻿@using TenantManagement.Common;
+@model TenantManagement.Models.EmailBaseModel
+@{
+    ViewBag.Title = "RSG Inventory Email Change Request";
+    Layout = "~/EmailTemplates/_Layout.cshtml";
+}
+
+<p style="color:#024584">Hello @Model.Data[nameof(EmailDataKeys.Name)],</p>
+<p style="color:#024584">A request has been made to change your email address.  If you did not initiate this change, please contact RSG immediately as your account may be compromised.</p>
+<p style="color:#024584">An email has been sent to @Model.Data[nameof(EmailDataKeys.Id)] with instructions to reset your password.</p>
+<p style="color:#024584">The new email address will take effect when you have successfully changed your password using the link sent to the new email address.</p>
+<br/>
+

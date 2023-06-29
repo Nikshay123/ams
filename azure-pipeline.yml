@@ -1,0 +1,100 @@
+
+name: $(Build.DefinitionName)-$(SourceBranchName)-$(Year:yy)$(DayOfYear).$(Build.BuildId)
+
+trigger:
+  branches:
+    include:
+      - dev
+      - test
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: UnitTestStage
+  displayName: Unit Test Stage
+  condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'dev'))        
+  jobs:
+  - job: RunUnitTests
+    displayName: Run Unit Tests
+    steps: 
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore nuget packages'
+      inputs:
+        command: 'restore'
+        projects: 'WebApp.sln'
+        #feedsToUse: 'select'
+        #vstsFeed: '699f1602-bf86-41f0-96b1-dab15cee5b0b/d21cb406-e814-4ff3-9cef-8897a3ee8f96'    
+    - task: DotNetCoreCLI@2
+      displayName: 'Execute Unit Tests'    
+      inputs:
+        command: 'test'
+        projects: 'WebApp.sln'
+        testRunTitle: 'Unit Tests'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+- stage: BuildAndPublishMigrationAssets
+  displayName: Build and Publish Migration Assets
+  condition: or(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))        
+  jobs:
+  - job: BuildAndPublishMigrationAssets
+    displayName: Build and Publish Migration Assets
+    steps: 
+    - task: CopyFiles@2
+      displayName: Copy Migration Projects    
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: |
+          **/**    
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Migration Assets
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'seed-backend-azure-webapp'
+        publishLocation: 'Container' 
+        
+- stage: BuildAndPushDockerImage
+  displayName: Build and Push Docker Image to Azure Container Registry
+  condition: always()
+  jobs:
+  - job: BuildAndPushDockerImage
+    displayName: Build and Push Docker Image to Azure Container Registry
+    steps:
+    - checkout: self
+      persistCredentials: true    
+    - powershell: |
+       Write-Host "Setting up the date time for build variable"
+       $day='{0:d3}' -f (Get-Date).DayOfYear
+       Write-Host "##vso[task.setvariable variable=BuildVersion]1.0.$(Get-Date -Format yy)$day.$(Build.BuildId)"
+      displayName: 'Constructing Version' 
+    - task: Docker@1
+      displayName: Build Docker Image | $(Build.SourceBranchName)
+      env:
+        FEED_ACCESSTOKEN: $(FEED_ACCESSTOKEN)
+      inputs:
+        command: 'Build an image'
+        arguments: '--build-arg BUILDVERSION=$(BuildVersion) --build-arg FEED_ACCESSTOKEN=$(FEED_ACCESSTOKEN)'
+        dockerFile: 'Dockerfile'
+        includeLatestTag: false
+        useDefaultContext: false
+        buildContext: .
+        imageName: 'seed/seed-api/$(Build.SourceBranchName):$(Build.BuildId)'
+    - task: AzureCLI@1
+      displayName: Push Docker Image | seed/seed-api/$(Build.SourceBranchName):$(Build.BuildId)   
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))     
+      inputs:
+        azureSubscription: 'seed Azure Subscription'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr login --name seednxgen
+          docker tag seed/seed-api/$(Build.SourceBranchName):$(Build.BuildId) seednxgen.azurecr.io/seed/seed-api/$(Build.SourceBranchName):$(Build.BuildId)
+          docker push seednxgen.azurecr.io/seed/seed-api/$(Build.SourceBranchName):$(Build.BuildId)
+        failOnStandardError: true
+#    - script: |
+#        git config user.email "build@pipeline.com"
+#        git config user.name "Build Pipeline"
+#        git tag -a 'v$(Build.BuildId)' -m "build pipeline"
+#        git push --tags 
+#      workingDirectory: $(Build.SourcesDirectory)
+#      displayName: 'Git Commit and Tag from pipeline'   

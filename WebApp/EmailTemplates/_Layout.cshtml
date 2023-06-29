@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<title>@ViewBag.Title</title>
+</head>
+<body>
+	<table style="font-family: Verdana, sans-serif; width: 100%; max-width: 50rem; margin: auto;">
+		<tr>
+			<td colspan="8">
+				<img src="https://@Model.Data["Domain"]/images/rsg-horizontal-full-color.png" alt="RSG" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="8">
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="8">
+				@RenderBody()
+			</td>
+		</tr>
+		<tr>
+			<td colspan="8">
+				<hr />
+			</td>
+		</tr>
+		<tr style="font-weight: bolder; color: #545556; text-decoration:none">
+			<td><a style="color: #545556; text-decoration:none" href="https://reprospecialty.com/about-us/">About RSG&nbsp;&nbsp;</a></td>
+			<td><a style="color: #545556; text-decoration:none" href="https://reprospecialty.com/wp-content/uploads/2022/04/RSGI-Website-Terms-of-Use-.pdf">Terms & Conditions&nbsp;&nbsp;</a></td>
+			<td><a style="color: #545556; text-decoration:none" href="https://reprospecialty.com/wp-content/uploads/2022/04/RSGI-Online-Privacy-Notice.pdf">Privacy Policy&nbsp;&nbsp;</a></td>
+			<td><a style="color: #545556; text-decoration:none" href="https://reprospecialty.com/my-account/">Join RSG&nbsp;&nbsp;</a></td>
+			<td style="min-width: 2rem;"></td>
+			<td>
+				<a style="display:block; min-width: 2rem;" href="https://www.facebook.com/RSGIndiana">
+					<img src="https://@Model.Data["Domain"]/images/facebook-link.png" alt="Facebook" />
+				</a>
+			</td>
+			<td>
+				<a style="display:block; min-width: 2rem;" href="https://www.youtube.com/channel/UCixJzV7uzDww0VsKLOylKFg">
+					<img src="https://@Model.Data["Domain"]/images/youtube-link.png" alt="Youtube" />
+				</a>
+			</td>
+			<td>
+				<a style="display:block; min-width: 1rem;" href="https://www.linkedin.com/company/reproduction-specialty-group/about/">
+					<img src="https://@Model.Data["Domain"]/images/linkedin-link.png" alt="LinkedIn" />
+				</a>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

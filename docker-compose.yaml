@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:     
+  # in container sql cmd access: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P <your_password>  sqlserver:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
+#    depends_on:
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Intimet3c!"
+      MSSQL_PID: "Express"
+      MSSQL_AGENT_ENABLED: "true" 
+    volumes:
+      - sqlserver_vol:/var/opt/mssql
+
+  azurite:
+    image: 'mcr.microsoft.com/azure-storage/azurite'
+    restart: always
+    ports:
+      - '10000:10000'
+      - '10001:10001'
+      - '10002:10002'
+    volumes:
+      - azurite_vol:/data
+      
+volumes: # windows location: \\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes
+  sqlserver_vol:
+  azurite_vol:
