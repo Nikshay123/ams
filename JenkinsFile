@@ -2,45 +2,43 @@ pipeline {
     agent any
     
     stages {
+        stage('Clean') {
+            steps {
+                sh 'dotnet clean'
+            }
+        }
+        
         stage('Restore') {
             steps {
-                script {
-                    sh 'dotnet restore WebApp.sln'
-                }
+                sh 'dotnet restore'
             }
         }
         
         stage('Build') {
             steps {
-                script {
-                    sh 'dotnet build WebApp.sln --configuration Release --no-restore'
-                }
+                sh 'dotnet build --configuration Release'
             }
         }
         
         stage('Test') {
             steps {
-                script {
-                    sh 'dotnet test WebApp.sln --configuration Release --no-build'
-                }
+                sh 'dotnet test'
             }
         }
         
         stage('Publish') {
             steps {
-                script {
-                    sh 'dotnet publish WebApp.sln --configuration Release --no-restore --output ./publish'
-                }
+                sh 'dotnet publish --configuration Release --output ./publish'
             }
         }
     }
     
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Build successful!'
         }
         failure {
-            echo 'Pipeline failed. Check logs for details.'
+            echo 'Build failed!'
         }
     }
 }
