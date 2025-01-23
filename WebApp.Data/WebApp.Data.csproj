@@ -19,12 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Migrations\DBScripts\SampleTrigger\SampleTrigger.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 </Project>
