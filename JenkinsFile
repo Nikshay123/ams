@@ -1,52 +1,58 @@
-pipeline {
-    agent any
-    
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('Restore Dependencies') {
-            steps {
-                dir('WebApp') {
-                    sh 'dotnet restore WebApp.sln'
-                }
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                dir('WebApp') {
-                    sh 'dotnet build WebApp.sln --configuration Release'
-                }
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                dir('UnitTestsS') {
-                    sh 'dotnet test --no-restore --configuration Release'
-                }
-            }
-        }
-        
-        stage('Publish') {
-            steps {
-                dir('WebApp') {
-                    sh 'dotnet publish WebApp.sln --no-restore --configuration Release --output ./publish'
-                }
-            }
-        }
-    }
-    
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the logs for details.'
-        }
-    }
+#!/bin/bash
+
+# Set variables
+SOLUTION_FILE="WebApp.sln"
+PROJECTS=(
+    "WebApp.Common/WebApp.Common.csproj"
+    "TenantManagement/TenantManagement.csproj"
+    "WebApp.Data/WebApp.Data.csproj"
+    "WebApp/WebApp.csproj"
+)
+
+# Function to build projects
+build_projects() {
+    for project in "${PROJECTS[@]}"; do
+        echo "Building $project..."
+        dotnet build "$project" --configuration Release
+        if [ $? -ne 0 ]; then
+            echo "Build failed for $project"
+            exit 1
+        fi
+    done
 }
+
+# Function to run tests
+run_tests() {
+    dotnet test "$SOLUTION_FILE" --configuration Release
+}
+
+# Function to publish projects
+publish_projects() {
+    for project in "${PROJECTS[@]}"; do
+        output_dir="./publish/$(basename "$(dirname "$project")")"
+        echo "Publishing $project to $output_dir"
+        dotnet publish "$project" --configuration Release --output "$output_dir"
+    done
+}
+
+# Main script execution
+main() {
+    echo "Starting build process..."
+    
+    # Restore dependencies
+    dotnet restore "$SOLUTION_FILE"
+    
+    # Build projects
+    build_projects
+    
+    # Run tests
+    run_tests
+    
+    # Publish projects
+    publish_projects
+    
+    echo "Build process completed successfully!"
+}
+
+# Execute main function
+main
