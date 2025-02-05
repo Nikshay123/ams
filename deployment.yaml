@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebapi-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mywebapi
+  template:
+    metadata:
+      labels:
+        app: mywebapi
+    spec:
+      containers:
+      - name: mywebapi
+        image: nikshay7891/myimage:latest  # Replace with your image location
+        ports:
+        - containerPort: 80
